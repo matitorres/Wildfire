@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Wildfire</string>
+    <string name="mail">Correo electrónico</string>
+    <string name="clave">Contraseña</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="title_activity_main">Map</string>
+    <string name="title_activity_maps">Map</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="btn_focos">Mostrar focos</string>
+    <string name="btn_denuncias">Mostrar denuncias</string>
+    <string name="btn_instituciones">Mostrar instituciones</string>
+    <string name="btn_perfil">Editar perfil</string>
+    <string name="btn_logout">Salir</string>
+    <string name="perfil">Perfil</string>
+    <string name="nombre_apellido">Nombre y apellido</string>
+    <string name="telefono">Teléfono</string>
+    <string name="guardar_cambios">Guardar cambios</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="cambiar_clave">Cambiar contraseña</string>
+    <string name="repetir_clave_nueva">Repetir contraseña nueva</string>
+    <string name="clave_nueva">Contraseña nueva</string>
+    <string name="validar">Validar</string>
+    <string name="rechazar">Rechazar</string>
+    <string name="recursos">Recursos</string>
+    <string name="enviar_foco">Enviar foco</string>
+    <string name="llamar_institucion">Llamar institucion</string>
+    <string name="estado_foco_1">fuera de control</string>
+    <string name="reasignar_foco">Reasignar foco</string>
+    <string name="volver_foco">Volver al foco</string>
+    <string name="llamar_coordinador">Llamar coordinador</string>
+</resources>
