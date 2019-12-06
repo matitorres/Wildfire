@@ -71,6 +71,13 @@ public class ApiClient {
         // Focos
         @GET("focos")
         Call<List<Foco>> getFocos(@Header("Authorization")String token);
+        @POST("focos")
+        Call<Foco> postFoco(@Header("Authorization")String token, @Body Foco foco);
+        @PUT("focos/{id}")
+        Call<Foco> putFoco(
+                @Header("Authorization")String token,
+                @Path("id") int id,
+                @Body Foco foco);
 
         // Instituciones
         @GET("instituciones")

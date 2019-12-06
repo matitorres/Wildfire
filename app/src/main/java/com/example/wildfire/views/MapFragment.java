@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -33,6 +34,7 @@ import com.example.wildfire.adapters.ListaBrigadasAdapter;
 import com.example.wildfire.adapters.ListaBrigadistasAdapter;
 import com.example.wildfire.models.Brigada;
 import com.example.wildfire.models.Brigadista;
+import com.example.wildfire.models.Coordinador;
 import com.example.wildfire.models.Denuncia;
 import com.example.wildfire.models.Foco;
 import com.example.wildfire.models.Institucion;
@@ -40,6 +42,7 @@ import com.example.wildfire.models.Integrante;
 import com.example.wildfire.models.Recurso;
 import com.example.wildfire.models.RecursoBrigada;
 import com.example.wildfire.request.ApiClient;
+import com.example.wildfire.viewmodels.CoordinadorViewModel;
 import com.example.wildfire.viewmodels.DenunciaViewModel;
 import com.example.wildfire.viewmodels.FocoViewModel;
 import com.example.wildfire.viewmodels.InstitucionViewModel;
@@ -62,14 +65,17 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MapFragment extends SupportMapFragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener  {
+public class MapFragment extends SupportMapFragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapLongClickListener {
 
     private FocoViewModel focoViewModel;
     private InstitucionViewModel institucionViewModel;
     private DenunciaViewModel denunciaViewModel;
+    private CoordinadorViewModel coordinadorViewModel;
     private SharedPreferences sp;
     private final LatLng SAN_LUIS = new LatLng(-33.2762202,-65.9515546);
     public static GoogleMap googleMap;
+    private int coordinadorId;
+    private EditText etDescripcionFoco;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,6 +88,8 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
 
         return rootView;
     }
+
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -101,6 +109,7 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
 
         googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.setOnMarkerClickListener(this);
+        googleMap.setOnMapLongClickListener(this);
 
         this.googleMap = googleMap;
 
@@ -189,6 +198,8 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
             }
         });
         denunciaViewModel.setDenuncias();
+
+        coordinadorViewModel = ViewModelProviders.of(this).get(CoordinadorViewModel.class);
 
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SAN_LUIS, 10));
     }
@@ -438,7 +449,52 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
                 btnDescripcionFoco.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        View dialogNuevoFoco = getLayoutInflater().inflate(R.layout.dialog_nuevo_foco,null);
 
+                        etDescripcionFoco = dialogNuevoFoco.findViewById(R.id.etDescripcionFoco);
+                        etDescripcionFoco.setText(foco.getDescripcion());
+
+                        Button btnGuardarFoco = dialogNuevoFoco.findViewById(R.id.btnGuardarFoco);
+                        btnGuardarFoco.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Foco focoModificado = foco;
+                                focoModificado.setDescripcion(etDescripcionFoco.getText().toString());
+
+                                /*new ShowToast(getContext(), focoNuevo.getLatitud()
+                                        + " // " + focoNuevo.getLongitud()
+                                        + " // " + focoNuevo.getDescripcion()
+                                        + " // " + focoNuevo.getCoordinadorId());*/
+
+                                Call<Foco> dato = ApiClient.getMyApiClient().putFoco(
+                                        sp.getString("token",""),
+                                        foco.getFocoId(),
+                                        focoModificado
+                                );
+                                dato.enqueue(new Callback<Foco>() {
+                                    @Override
+                                    public void onResponse(Call<Foco> call, Response<Foco> response) {
+                                        if (response.isSuccessful()) {
+                                            new ShowToast(getContext(), "Foco actualizado" );
+                                        } else {
+                                            new ShowToast(getContext(), "Error al actualizar foco");
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Foco> call, Throwable t) {
+                                        new ShowToast(getContext(), t.getMessage());
+                                    }
+                                });
+                                focoViewModel.setFocos();
+                            }
+                        });
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setView(dialogNuevoFoco);
+                        final AlertDialog alertDialogNuevoFoco = builder.create();
+                        alertDialogNuevoFoco.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                        alertDialogNuevoFoco.show();
+                        alertDialogFoco.dismiss();
                     }
                 });
 
@@ -478,5 +534,72 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
                 break;
         }
         return true;
+    }
+
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        final String latitud = latLng.latitude+"";
+        final String longitud = latLng.longitude+"";
+
+        // AlertDialog NUEVO FOCO
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setCancelable(true);
+        LayoutInflater inflater = getLayoutInflater();
+
+        View dialogNuevoFoco = inflater.inflate(R.layout.dialog_nuevo_foco,null);
+
+        etDescripcionFoco = dialogNuevoFoco.findViewById(R.id.etDescripcionFoco);
+
+        coordinadorViewModel.getCoordinador().observe(this, new Observer<Coordinador>() {
+            @Override
+            public void onChanged(Coordinador coordinador) {
+                coordinadorId = coordinador.getCoordinadorId();
+            }
+        });
+
+        Button btnGuardarFoco = dialogNuevoFoco.findViewById(R.id.btnGuardarFoco);
+        btnGuardarFoco.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Foco focoNuevo = new Foco();
+                focoNuevo.setLatitud(latitud);
+                focoNuevo.setLongitud(longitud);
+                focoNuevo.setDescripcion(etDescripcionFoco.getText().toString());
+                focoNuevo.setCoordinadorId(coordinadorId);
+
+                /*new ShowToast(getContext(), focoNuevo.getLatitud()
+                        + " // " + focoNuevo.getLongitud()
+                        + " // " + focoNuevo.getDescripcion()
+                        + " // " + focoNuevo.getCoordinadorId());*/
+
+                Call<Foco> dato = ApiClient.getMyApiClient().postFoco(
+                        sp.getString("token",""),
+                        focoNuevo
+                );
+                dato.enqueue(new Callback<Foco>() {
+                    @Override
+                    public void onResponse(Call<Foco> call, Response<Foco> response) {
+                        if (response.isSuccessful()) {
+                            new ShowToast(getContext(), "Foco creado" );
+                        } else {
+                            new ShowToast(getContext(), "Error al crear foco");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Foco> call, Throwable t) {
+                        new ShowToast(getContext(), t.getMessage());
+                    }
+                });
+                focoViewModel.setFocos();
+            }
+        });
+        builder.setView(dialogNuevoFoco);
+        final AlertDialog alertDialogNuevoFoco = builder.create();
+        alertDialogNuevoFoco.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        alertDialogNuevoFoco.show();
+        coordinadorViewModel.setCoordinador();
+
     }
 }

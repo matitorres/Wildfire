@@ -28,6 +28,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private MainViewModel mainViewModel;
+    private CoordinadorViewModel coordinadorViewModel;
     private String token;
     private SharedPreferences sp;
     private FloatingActionButton btnOptions;
@@ -51,8 +52,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        mainViewModel.setBtnOptionsVisible(View.VISIBLE);
     }
 
     private void validarSesion() {
@@ -90,6 +89,9 @@ public class MainActivity extends AppCompatActivity {
                 btnOptions.setVisibility(e);
             }
         });
+        coordinadorViewModel = ViewModelProviders.of(this).get(CoordinadorViewModel.class);
+        coordinadorViewModel.getCoordinador();
+        coordinadorViewModel.setCoordinador();
 
         // Dialog menu
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -163,5 +165,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+
     }
 }

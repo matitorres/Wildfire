@@ -30,4 +30,5 @@
     <string name="reasignar_foco">Reasignar foco</string>
     <string name="volver_foco">Volver al foco</string>
     <string name="llamar_coordinador">Llamar coordinador</string>
+    <string name="hint_descripcion_foco">Ingresa una descripción para el foco</string>
 </resources>
