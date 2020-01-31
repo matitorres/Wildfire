@@ -455,6 +455,10 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
                         etDescripcionFoco.setText(foco.getDescripcion());
 
                         Button btnGuardarFoco = dialogNuevoFoco.findViewById(R.id.btnGuardarFoco);
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setView(dialogNuevoFoco);
+                        final AlertDialog alertDialogNuevoFoco = builder.create();
                         btnGuardarFoco.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -487,11 +491,9 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
                                     }
                                 });
                                 focoViewModel.setFocos();
+                                alertDialogNuevoFoco.dismiss();
                             }
                         });
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                        builder.setView(dialogNuevoFoco);
-                        final AlertDialog alertDialogNuevoFoco = builder.create();
                         alertDialogNuevoFoco.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                         alertDialogNuevoFoco.show();
                         alertDialogFoco.dismiss();
@@ -558,6 +560,9 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
             }
         });
 
+        builder.setView(dialogNuevoFoco);
+        final AlertDialog alertDialogNuevoFoco = builder.create();
+
         Button btnGuardarFoco = dialogNuevoFoco.findViewById(R.id.btnGuardarFoco);
         btnGuardarFoco.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -593,10 +598,10 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
                     }
                 });
                 focoViewModel.setFocos();
+                alertDialogNuevoFoco.dismiss();
             }
         });
-        builder.setView(dialogNuevoFoco);
-        final AlertDialog alertDialogNuevoFoco = builder.create();
+
         alertDialogNuevoFoco.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         alertDialogNuevoFoco.show();
         coordinadorViewModel.setCoordinador();

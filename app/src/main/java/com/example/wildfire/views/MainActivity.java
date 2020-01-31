@@ -50,10 +50,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onBackPressed() {
-    }
-
     private void validarSesion() {
         sp = getSharedPreferences("token",0);
         token = sp.getString("token", "");
